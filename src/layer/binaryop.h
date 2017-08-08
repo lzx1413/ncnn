@@ -12,17 +12,17 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
-#ifndef LAYER_RESHAPE_H
-#define LAYER_RESHAPE_H
+#ifndef LAYER_BINARYOP_H
+#define LAYER_BINARYOP_H
 
 #include "layer.h"
 
 namespace ncnn {
 
-class Reshape : public Layer
+class BinaryOp : public Layer
 {
 public:
-    Reshape();
+    BinaryOp();
 
 #if NCNN_STDIO
 #if NCNN_STRING
@@ -32,16 +32,23 @@ public:
 #endif // NCNN_STDIO
     virtual int load_param(const unsigned char*& mem);
 
-    virtual int forward(const Mat& bottom_blob, Mat& top_blob) const;
+    virtual int forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_blobs) const;
 
-private:
-    int w;
-    int h;
-    int c;
-    int permute;
-    int ndim;
+    enum {
+        Operation_ADD   = 0,
+        Operation_SUB   = 1,
+        Operation_MUL   = 2,
+        Operation_DIV   = 3,
+        Operation_MAX   = 4,
+        Operation_MIN   = 5,
+        Operation_POW   = 6
+    };
+
+public:
+    // param
+    int op_type;
 };
 
 } // namespace ncnn
 
-#endif // LAYER_RESHAPE_H
+#endif // LAYER_BINARYOP_H
