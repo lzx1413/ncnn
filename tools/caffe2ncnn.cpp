@@ -19,6 +19,7 @@
 #include <set>
 #include <limits>
 #include <algorithm>
+#include <iostream>
 
 #include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h>
@@ -26,7 +27,7 @@
 #include <google/protobuf/message.h>
 
 #include "caffe.pb.h"
-
+using namespace std;
 static inline size_t alignSize(size_t sz, int n)
 {
     return (sz + n-1) & -n;
@@ -216,6 +217,10 @@ int main(int argc, char** argv)
     const char* ncnn_modelbin = argc >= 5 ? argv[4] : "ncnn.bin";
     const char* quantize_param = argc == 6 ? argv[5] : "0";
     int quantize_level = atoi(quantize_param);
+    cout<<caffeproto<<endl;
+    cout<<caffemodel<<endl;
+    cout<<ncnn_prototxt<<endl;
+    cout<<ncnn_modelbin<<endl;
 
     if (quantize_level != 0 && quantize_level != 256 && quantize_level != 65536) {
         fprintf(stderr, "%s: only support quantize level = 0, 256, or 65536", argv[0]);
@@ -320,6 +325,7 @@ int main(int argc, char** argv)
         // layer definition line, repeated
         // [type] [name] [bottom blob count] [top blob count] [bottom blobs] [top blobs] [layer specific params]
         fprintf(pp, "%-16s %-16s %d %d", layer.type().c_str(), layer.name().c_str(), layer.bottom_size(), layer.top_size());
+        cout<<layer.type().c_str()<<"\t"<<layer.name().c_str()<<"\t"<<layer.bottom_size()<<"\t"<<layer.top_size()<<endl;
 
         for (int j=0; j<layer.bottom_size(); j++)
         {

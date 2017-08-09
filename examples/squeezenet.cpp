@@ -19,32 +19,39 @@
 #include <opencv2/highgui/highgui.hpp>
 
 #include "net.h"
+#include <iostream>
 
 static int detect_squeezenet(const cv::Mat& bgr, std::vector<float>& cls_scores)
 {
     ncnn::Net squeezenet;
-    squeezenet.load_param("squeezenet_v1.1.param");
-    squeezenet.load_model("squeezenet_v1.1.bin");
+    squeezenet.load_param("psp_sqz3.param");
+    squeezenet.load_model("psp_sqz3.bin");
 
-    ncnn::Mat in = ncnn::Mat::from_pixels_resize(bgr.data, ncnn::Mat::PIXEL_BGR, bgr.cols, bgr.rows, 227, 227);
+    ncnn::Mat in = ncnn::Mat::from_pixels_resize(bgr.data, ncnn::Mat::PIXEL_BGR, bgr.cols, bgr.rows, 177, 177);
 
     const float mean_vals[3] = {104.f, 117.f, 123.f};
     in.substract_mean_normalize(mean_vals, 0);
 
     ncnn::Extractor ex = squeezenet.create_extractor();
-    ex.set_light_mode(true);
+    ex.set_light_mode(false);
 
     ex.input("data", in);
 
     ncnn::Mat out;
-    ex.extract("prob", out);
+    //ex.extract("prob", out);
+    ex.extract("score_ft", out);
 
+    using namespace std;
+    cout<<"w"<<out.w<<"h"<<out.h<<"c"<<out.c<<endl;
     cls_scores.resize(out.c);
+    /*
     for (int j=0; j<out.c; j++)
     {
         const float* prob = out.data + out.cstep * j;
         cls_scores[j] = prob[0];
     }
+     */
+
 
     return 0;
 }
@@ -76,7 +83,8 @@ static int print_topk(const std::vector<float>& cls_scores, int topk)
 
 int main(int argc, char** argv)
 {
-    const char* imagepath = argv[1];
+    //const char* imagepath = argv[1];
+    const char* imagepath = "dog.jpeg";
 
     cv::Mat m = cv::imread(imagepath, CV_LOAD_IMAGE_COLOR);
     if (m.empty())
@@ -88,7 +96,7 @@ int main(int argc, char** argv)
     std::vector<float> cls_scores;
     detect_squeezenet(m, cls_scores);
 
-    print_topk(cls_scores, 3);
+    //print_topk(cls_scores, 3);
 
     return 0;
 }

@@ -1,0 +1,92 @@
+91 103
+Input            data             0 1 data 3 227 227
+Convolution      conv1            1 1 data conv1 24 3 1 2 0 1 648
+ReLU             relu_conv1       1 1 conv1 conv1_relu_conv1 0.000000
+Pooling          pool1            1 1 conv1_relu_conv1 pool1 0 3 2 0 0
+Convolution      fire2/squeeze1x1 1 1 pool1 fire2/squeeze1x1 16 1 1 1 0 1 384
+ReLU             fire2/relu_squeeze1x1 1 1 fire2/squeeze1x1 fire2/squeeze1x1_fire2/relu_squeeze1x1 0.000000
+Split            splitncnn_0      1 2 fire2/squeeze1x1_fire2/relu_squeeze1x1 fire2/squeeze1x1_fire2/relu_squeeze1x1_splitncnn_0 fire2/squeeze1x1_fire2/relu_squeeze1x1_splitncnn_1
+Convolution      fire2/expand1x1  1 1 fire2/squeeze1x1_fire2/relu_squeeze1x1_splitncnn_1 fire2/expand1x1 32 1 1 1 0 1 512
+ReLU             fire2/relu_expand1x1 1 1 fire2/expand1x1 fire2/expand1x1_fire2/relu_expand1x1 0.000000
+Convolution      fire2/expand3x3  1 1 fire2/squeeze1x1_fire2/relu_squeeze1x1_splitncnn_0 fire2/expand3x3 16 3 1 1 1 1 2304
+ReLU             fire2/relu_expand3x3 1 1 fire2/expand3x3 fire2/expand3x3_fire2/relu_expand3x3 0.000000
+Concat           fire2/concat     2 1 fire2/expand1x1_fire2/relu_expand1x1 fire2/expand3x3_fire2/relu_expand3x3 fire2/concat
+Convolution      fire3/squeeze1x1 1 1 fire2/concat fire3/squeeze1x1 16 1 1 1 0 1 768
+ReLU             fire3/relu_squeeze1x1 1 1 fire3/squeeze1x1 fire3/squeeze1x1_fire3/relu_squeeze1x1 0.000000
+Split            splitncnn_1      1 2 fire3/squeeze1x1_fire3/relu_squeeze1x1 fire3/squeeze1x1_fire3/relu_squeeze1x1_splitncnn_0 fire3/squeeze1x1_fire3/relu_squeeze1x1_splitncnn_1
+Convolution      fire3/expand1x1  1 1 fire3/squeeze1x1_fire3/relu_squeeze1x1_splitncnn_1 fire3/expand1x1 32 1 1 1 0 1 512
+ReLU             fire3/relu_expand1x1 1 1 fire3/expand1x1 fire3/expand1x1_fire3/relu_expand1x1 0.000000
+Convolution      fire3/expand3x3  1 1 fire3/squeeze1x1_fire3/relu_squeeze1x1_splitncnn_0 fire3/expand3x3 16 3 1 1 1 1 2304
+ReLU             fire3/relu_expand3x3 1 1 fire3/expand3x3 fire3/expand3x3_fire3/relu_expand3x3 0.000000
+Concat           fire3/concat     2 1 fire3/expand1x1_fire3/relu_expand1x1 fire3/expand3x3_fire3/relu_expand3x3 fire3/concat
+Pooling          pool3            1 1 fire3/concat pool3 0 3 2 0 0
+Convolution      fire4/squeeze1x1 1 1 pool3 fire4/squeeze1x1 32 1 1 1 0 1 1536
+ReLU             fire4/relu_squeeze1x1 1 1 fire4/squeeze1x1 fire4/squeeze1x1_fire4/relu_squeeze1x1 0.000000
+Split            splitncnn_2      1 2 fire4/squeeze1x1_fire4/relu_squeeze1x1 fire4/squeeze1x1_fire4/relu_squeeze1x1_splitncnn_0 fire4/squeeze1x1_fire4/relu_squeeze1x1_splitncnn_1
+Convolution      fire4/expand1x1  1 1 fire4/squeeze1x1_fire4/relu_squeeze1x1_splitncnn_1 fire4/expand1x1 64 1 1 1 0 1 2048
+ReLU             fire4/relu_expand1x1 1 1 fire4/expand1x1 fire4/expand1x1_fire4/relu_expand1x1 0.000000
+Convolution      fire4/expand3x3  1 1 fire4/squeeze1x1_fire4/relu_squeeze1x1_splitncnn_0 fire4/expand3x3 32 3 1 1 1 1 9216
+ReLU             fire4/relu_expand3x3 1 1 fire4/expand3x3 fire4/expand3x3_fire4/relu_expand3x3 0.000000
+Concat           fire4/concat     2 1 fire4/expand1x1_fire4/relu_expand1x1 fire4/expand3x3_fire4/relu_expand3x3 fire4/concat
+Convolution      fire5/squeeze1x1 1 1 fire4/concat fire5/squeeze1x1 32 1 1 1 0 1 3072
+ReLU             fire5/relu_squeeze1x1 1 1 fire5/squeeze1x1 fire5/squeeze1x1_fire5/relu_squeeze1x1 0.000000
+Split            splitncnn_3      1 2 fire5/squeeze1x1_fire5/relu_squeeze1x1 fire5/squeeze1x1_fire5/relu_squeeze1x1_splitncnn_0 fire5/squeeze1x1_fire5/relu_squeeze1x1_splitncnn_1
+Convolution      fire5/expand1x1  1 1 fire5/squeeze1x1_fire5/relu_squeeze1x1_splitncnn_1 fire5/expand1x1 64 1 1 1 0 1 2048
+ReLU             fire5/relu_expand1x1 1 1 fire5/expand1x1 fire5/expand1x1_fire5/relu_expand1x1 0.000000
+Convolution      fire5/expand3x3  1 1 fire5/squeeze1x1_fire5/relu_squeeze1x1_splitncnn_0 fire5/expand3x3 32 3 1 1 1 1 9216
+ReLU             fire5/relu_expand3x3 1 1 fire5/expand3x3 fire5/expand3x3_fire5/relu_expand3x3 0.000000
+Concat           fire5/concat     2 1 fire5/expand1x1_fire5/relu_expand1x1 fire5/expand3x3_fire5/relu_expand3x3 fire5/concat
+Pooling          pool5            1 1 fire5/concat pool5 0 3 2 1 0
+Convolution      fire6/squeeze1x1 1 1 pool5 fire6/squeeze1x1 48 1 1 1 0 1 4608
+ReLU             fire6/relu_squeeze1x1 1 1 fire6/squeeze1x1 fire6/squeeze1x1_fire6/relu_squeeze1x1 0.000000
+Split            splitncnn_4      1 2 fire6/squeeze1x1_fire6/relu_squeeze1x1 fire6/squeeze1x1_fire6/relu_squeeze1x1_splitncnn_0 fire6/squeeze1x1_fire6/relu_squeeze1x1_splitncnn_1
+Convolution      fire6/expand1x1  1 1 fire6/squeeze1x1_fire6/relu_squeeze1x1_splitncnn_1 fire6/expand1x1 96 1 1 1 0 1 4608
+ReLU             fire6/relu_expand1x1 1 1 fire6/expand1x1 fire6/expand1x1_fire6/relu_expand1x1 0.000000
+Convolution      fire6/expand3x3  1 1 fire6/squeeze1x1_fire6/relu_squeeze1x1_splitncnn_0 fire6/expand3x3 48 3 1 1 1 1 20736
+ReLU             fire6/relu_expand3x3 1 1 fire6/expand3x3 fire6/expand3x3_fire6/relu_expand3x3 0.000000
+Concat           fire6/concat     2 1 fire6/expand1x1_fire6/relu_expand1x1 fire6/expand3x3_fire6/relu_expand3x3 fire6/concat
+Convolution      fire7/squeeze1x1 1 1 fire6/concat fire7/squeeze1x1 48 1 1 1 0 1 6912
+ReLU             fire7/relu_squeeze1x1 1 1 fire7/squeeze1x1 fire7/squeeze1x1_fire7/relu_squeeze1x1 0.000000
+Split            splitncnn_5      1 2 fire7/squeeze1x1_fire7/relu_squeeze1x1 fire7/squeeze1x1_fire7/relu_squeeze1x1_splitncnn_0 fire7/squeeze1x1_fire7/relu_squeeze1x1_splitncnn_1
+Convolution      fire7/expand1x1  1 1 fire7/squeeze1x1_fire7/relu_squeeze1x1_splitncnn_1 fire7/expand1x1 96 1 1 1 0 1 4608
+ReLU             fire7/relu_expand1x1 1 1 fire7/expand1x1 fire7/expand1x1_fire7/relu_expand1x1 0.000000
+Convolution      fire7/expand3x3  1 1 fire7/squeeze1x1_fire7/relu_squeeze1x1_splitncnn_0 fire7/expand3x3 48 3 1 1 1 1 20736
+ReLU             fire7/relu_expand3x3 1 1 fire7/expand3x3 fire7/expand3x3_fire7/relu_expand3x3 0.000000
+Concat           fire7/concat     2 1 fire7/expand1x1_fire7/relu_expand1x1 fire7/expand3x3_fire7/relu_expand3x3 fire7/concat
+Convolution      fire8/squeeze1x1 1 1 fire7/concat fire8/squeeze1x1 64 1 1 1 0 1 9216
+ReLU             fire8/relu_squeeze1x1 1 1 fire8/squeeze1x1 fire8/squeeze1x1_fire8/relu_squeeze1x1 0.000000
+Split            splitncnn_6      1 2 fire8/squeeze1x1_fire8/relu_squeeze1x1 fire8/squeeze1x1_fire8/relu_squeeze1x1_splitncnn_0 fire8/squeeze1x1_fire8/relu_squeeze1x1_splitncnn_1
+Convolution      fire8/expand1x1  1 1 fire8/squeeze1x1_fire8/relu_squeeze1x1_splitncnn_1 fire8/expand1x1 128 1 1 1 0 1 8192
+ReLU             fire8/relu_expand1x1 1 1 fire8/expand1x1 fire8/expand1x1_fire8/relu_expand1x1 0.000000
+Convolution      fire8/expand3x3  1 1 fire8/squeeze1x1_fire8/relu_squeeze1x1_splitncnn_0 fire8/expand3x3 64 3 1 1 1 1 36864
+ReLU             fire8/relu_expand3x3 1 1 fire8/expand3x3 fire8/expand3x3_fire8/relu_expand3x3 0.000000
+Concat           fire8/concat     2 1 fire8/expand1x1_fire8/relu_expand1x1 fire8/expand3x3_fire8/relu_expand3x3 fire8/concat
+Convolution      fire9/squeeze1x1 1 1 fire8/concat fire9/squeeze1x1 64 1 1 1 0 1 12288
+ReLU             fire9/relu_squeeze1x1 1 1 fire9/squeeze1x1 fire9/squeeze1x1_fire9/relu_squeeze1x1 0.000000
+Split            splitncnn_7      1 2 fire9/squeeze1x1_fire9/relu_squeeze1x1 fire9/squeeze1x1_fire9/relu_squeeze1x1_splitncnn_0 fire9/squeeze1x1_fire9/relu_squeeze1x1_splitncnn_1
+Convolution      fire9/expand1x1  1 1 fire9/squeeze1x1_fire9/relu_squeeze1x1_splitncnn_1 fire9/expand1x1 128 1 1 1 0 1 8192
+ReLU             fire9/relu_expand1x1 1 1 fire9/expand1x1 fire9/expand1x1_fire9/relu_expand1x1 0.000000
+Convolution      fire9/expand3x3  1 1 fire9/squeeze1x1_fire9/relu_squeeze1x1_splitncnn_0 fire9/expand3x3 64 3 1 1 1 1 36864
+ReLU             fire9/relu_expand3x3 1 1 fire9/expand3x3 fire9/expand3x3_fire9/relu_expand3x3 0.000000
+Concat           fire9/concat     2 1 fire9/expand1x1_fire9/relu_expand1x1 fire9/expand3x3_fire9/relu_expand3x3 fire9/concat
+Split            splitncnn_8      1 5 fire9/concat fire9/concat_splitncnn_0 fire9/concat_splitncnn_1 fire9/concat_splitncnn_2 fire9/concat_splitncnn_3 fire9/concat_splitncnn_4
+Convolution      fire9_conv       1 1 fire9/concat_splitncnn_4 fire9_conv 32 1 1 1 0 1 6144
+ReLU             fire9_conv_relu  1 1 fire9_conv fire9_conv_fire9_conv_relu 0.000000
+Pooling          squeeze_pool1    1 1 fire9/concat_splitncnn_3 squeeze_pool1 1 12 12 0 0
+Convolution      squeeze_pool1_conv 1 1 squeeze_pool1 squeeze_pool1_conv 32 1 1 1 0 1 6144
+ReLU             squeeze_pool1_relu 1 1 squeeze_pool1_conv squeeze_pool1_conv_squeeze_pool1_relu 0.000000
+Deconvolution    squeeze_pool1_upsample 1 1 squeeze_pool1_conv_squeeze_pool1_relu squeeze_pool1_upsample 32 12 1 12 0 0 147456
+Pooling          squeeze_pool2    1 1 fire9/concat_splitncnn_2 squeeze_pool2 1 6 6 0 0
+Convolution      squeeze_pool2_conv 1 1 squeeze_pool2 squeeze_pool2_conv 32 1 1 1 0 1 6144
+ReLU             squeeze_pool2_relu 1 1 squeeze_pool2_conv squeeze_pool2_conv_squeeze_pool2_relu 0.000000
+Deconvolution    squeeze_pool2_upsample 1 1 squeeze_pool2_conv_squeeze_pool2_relu squeeze_pool2_upsample 32 6 1 6 0 0 36864
+Pooling          squeeze_pool3    1 1 fire9/concat_splitncnn_1 squeeze_pool3 1 4 4 0 0
+Convolution      squeeze_pool3_conv 1 1 squeeze_pool3 squeeze_pool3_conv 32 1 1 1 0 1 6144
+ReLU             squeeze_pool3_relu 1 1 squeeze_pool3_conv squeeze_pool3_conv_squeeze_pool3_relu 0.000000
+Deconvolution    squeeze_pool3_upsample 1 1 squeeze_pool3_conv_squeeze_pool3_relu squeeze_pool3_upsample 32 4 1 4 0 0 16384
+Pooling          squeeze_pool6    1 1 fire9/concat_splitncnn_0 squeeze_pool6 1 2 2 0 0
+Convolution      squeeze_pool6_conv 1 1 squeeze_pool6 squeeze_pool6_conv 32 1 1 1 0 1 6144
+ReLU             squeeze_pool6_relu 1 1 squeeze_pool6_conv squeeze_pool6_conv_squeeze_pool6_relu 0.000000
+Deconvolution    squeeze_pool6_upsample 1 1 squeeze_pool6_conv_squeeze_pool6_relu squeeze_pool6_upsample 32 2 1 2 0 0 4096
+Concat           psp_concat       5 1 fire9_conv_fire9_conv_relu squeeze_pool6_upsample squeeze_pool3_upsample squeeze_pool2_upsample squeeze_pool1_upsample psp_concat
+Convolution      score_ft         1 1 psp_concat score_ft 4 1 1 1 0 1 640

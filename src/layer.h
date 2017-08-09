@@ -130,6 +130,7 @@ enum
     Tile        = 37,
     RNN         = 38,
     LSTM        = 39,
+    Resize      = 42,
 
     CustomBit   = (1<<8),
 };
