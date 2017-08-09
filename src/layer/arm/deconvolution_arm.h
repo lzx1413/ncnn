@@ -12,36 +12,19 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
-#ifndef LAYER_RESHAPE_H
-#define LAYER_RESHAPE_H
+#ifndef LAYER_DECONVOLUTION_ARM_H
+#define LAYER_DECONVOLUTION_ARM_H
 
-#include "layer.h"
+#include "deconvolution.h"
 
 namespace ncnn {
 
-class Reshape : public Layer
+class Deconvolution_arm : public Deconvolution
 {
 public:
-    Reshape();
-
-#if NCNN_STDIO
-#if NCNN_STRING
-    virtual int load_param(FILE* paramfp);
-#endif // NCNN_STRING
-    virtual int load_param_bin(FILE* paramfp);
-#endif // NCNN_STDIO
-    virtual int load_param(const unsigned char*& mem);
-
-    virtual int forward(const Mat& bottom_blob, Mat& top_blob) const;
-
-private:
-    int w;
-    int h;
-    int c;
-    int permute;
-    int ndim;
+    virtual int forward(const Mat& bottom_blobs, Mat& top_blobs) const;
 };
 
 } // namespace ncnn
 
-#endif // LAYER_RESHAPE_H
+#endif // LAYER_DECONVOLUTION_ARM_H

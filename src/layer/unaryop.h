@@ -12,17 +12,17 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
-#ifndef LAYER_RESHAPE_H
-#define LAYER_RESHAPE_H
+#ifndef LAYER_UNARYOP_H
+#define LAYER_UNARYOP_H
 
 #include "layer.h"
 
 namespace ncnn {
 
-class Reshape : public Layer
+class UnaryOp : public Layer
 {
 public:
-    Reshape();
+    UnaryOp();
 
 #if NCNN_STDIO
 #if NCNN_STRING
@@ -34,14 +34,31 @@ public:
 
     virtual int forward(const Mat& bottom_blob, Mat& top_blob) const;
 
-private:
-    int w;
-    int h;
-    int c;
-    int permute;
-    int ndim;
+    virtual int forward_inplace(Mat& bottom_top_blob) const;
+
+    enum {
+        Operation_ABS   = 0,
+        Operation_NEG   = 1,
+        Operation_FLOOR = 2,
+        Operation_CEIL  = 3,
+        Operation_SQUARE= 4,
+        Operation_SQRT  = 5,
+        Operation_RSQRT = 6,
+        Operation_EXP   = 7,
+        Operation_LOG   = 8,
+        Operation_SIN   = 9,
+        Operation_COS   = 10,
+        Operation_TAN   = 11,
+        Operation_ASIN  = 12,
+        Operation_ACOS  = 13,
+        Operation_ATAN  = 14
+    };
+
+public:
+    // param
+    int op_type;
 };
 
 } // namespace ncnn
 
-#endif // LAYER_RESHAPE_H
+#endif // LAYER_UNARYOP_H

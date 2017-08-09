@@ -131,6 +131,8 @@ enum
     RNN         = 38,
     LSTM        = 39,
     Resize      = 42,
+    BinaryOp    = 40,
+    UnaryOp     = 41,
 
     CustomBit   = (1<<8),
 };

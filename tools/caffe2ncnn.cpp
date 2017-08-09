@@ -674,6 +674,7 @@ int main(int argc, char** argv)
             {
                 fprintf(pp, " -233");
             }
+            fprintf(pp, " 0");
         }
         else if (layer.type() == "ROIPooling")
         {
@@ -711,7 +712,7 @@ int main(int argc, char** argv)
                 int num_slice = slice_param.slice_point_size() + 1;
                 fprintf(pp, " %d", num_slice);
                 int prev_offset = 0;
-                for (int j=0; j<num_slice; j++)
+                for (int j=0; j<slice_param.slice_point_size(); j++)
                 {
                     int offset = slice_param.slice_point(j);
                     fprintf(pp, " %d", offset - prev_offset);
