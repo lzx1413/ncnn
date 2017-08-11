@@ -19,11 +19,11 @@
 
 namespace ncnn {
 
-    class Resize : public Layer
+    class Interp : public Layer
     {
     public:
-        Resize();
-        virtual ~Resize();
+        Interp();
+        virtual ~Interp();
 
 #if NCNN_STDIO
 #if NCNN_STRING
@@ -37,11 +37,11 @@ namespace ncnn {
 
     public:
         // param
-        float width_scale_;
-        float height_scale_;
-        int output_width_;
-        int output_height_;
-        int resize_type_;//1:near
+        float width_scale_ = 1;
+        float height_scale_ = 1;
+        int output_width_ = 0;
+        int output_height_ = 0;
+        int resize_type_;//1:near 2: bilinear
     };
 
 } // namespace ncnn

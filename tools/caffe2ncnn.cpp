@@ -495,6 +495,16 @@ int main(int argc, char** argv)
             int hoffset = (num_offset == 2) ? crop_param.offset(1) : 0;
             fprintf(pp, " %d %d", woffset, hoffset);
         }
+        else if (layer.type() == "Interp")
+        {
+            const caffe::InterpParameter interp_param = layer.interp_param();
+            auto height_scale = interp_param.zoom_factor();
+            auto width_scale = height_scale;
+            auto output_width = interp_param.width();
+            auto output_height = interp_param.height();
+            fprintf(pp,"%d %f %f %d %d", 2, height_scale, width_scale,output_width,output_height);
+
+        }
         else if (layer.type() == "Deconvolution")
         {
             const caffe::LayerParameter& binlayer = net.layer(netidx);

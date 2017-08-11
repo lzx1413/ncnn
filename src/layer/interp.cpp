@@ -2,27 +2,28 @@
 // Created by fotoable on 2017/8/7.
 //
 
-#include "resize.h"
+#include "interp.h"
 #include <assert.h>
 
 #if __ARM_NEON
 #include <arm_neon.h>
 #endif // __ARM_NEON
 namespace ncnn {
-    DEFINE_LAYER_CREATOR(Resize);
+    DEFINE_LAYER_CREATOR(Interp);
 
-    Resize::Resize() {
+    Interp::Interp() {
+        one_blob_only = true;
     }
 
-    Resize::~Resize() {};
+    Interp::~Interp() {};
 
 #if NCNN_STDIO
 #if NCNN_STRING
 
-    int Resize::load_param(FILE *paramfp) {
-        int nscan = fscanf(paramfp, "%d %f %f", &type, &height_scale_, &width_scale_);
+    int Interp::load_param(FILE *paramfp) {
+        int nscan = fscanf(paramfp, "%d %f %f %d %d", &type, &height_scale_, &width_scale_,&output_width_,&output_height_);
         if (nscan != 3) {
-            fprintf(stderr, "Resize load_param failed %d\n", nscan);
+            fprintf(stderr, "Interp load_param failed %d\n", nscan);
             return -1;
         }
         return 0;
@@ -30,7 +31,7 @@ namespace ncnn {
 
 #endif
 
-    int Resize::load_param_bin(FILE *paramfp) {
+    int Interp::load_param_bin(FILE *paramfp) {
         fread(&resize_type_, sizeof(int), 1, paramfp);
         fread(&height_scale_, sizeof(float), 1, paramfp);
         fread(&width_scale_, sizeof(float), 1, paramfp);
@@ -41,7 +42,7 @@ namespace ncnn {
 
 #endif
 
-    int Resize::load_param(const unsigned char *&mem) {
+    int Interp::load_param(const unsigned char *&mem) {
         resize_type_ = *(int *) (mem);
         mem += 4;
         height_scale_ = *(float *) (mem);
@@ -150,7 +151,7 @@ namespace ncnn {
             }
         }
     }
-    int Resize::forward(const Mat &bottom_blobs, Mat &top_blobs) const {
+    int Interp::forward(const Mat &bottom_blobs, Mat &top_blobs) const {
         auto h = bottom_blobs.h;
         auto w = bottom_blobs.w;
         auto c = bottom_blobs.c;

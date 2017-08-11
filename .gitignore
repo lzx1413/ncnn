@@ -1,5 +1,8 @@
 # CMake build directory
 *build*/
+examples/
+.idea/
+.DS_Store/
 
 # Backup files.
 *~

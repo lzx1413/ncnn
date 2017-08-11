@@ -63,12 +63,12 @@ message FillerParameter {
 
 message NetParameter {
   optional string name = 1; // consider giving the network a name
-  // DEPRECATED. See InputParameter. The input blobs to the network.
+  // The input blobs to the network.
   repeated string input = 3;
-  // DEPRECATED. See InputParameter. The shape of the input blobs.
+  // The shape of the input blobs.
   repeated BlobShape input_shape = 8;
 
-  // 4D input dimensions -- deprecated.  Use "input_shape" instead.
+  // 4D input dimensions -- deprecated.  Use "shape" instead.
   // If specified, for each input blob there should be four
   // values specifying the num, channels, height and width of the input blob.
   // Thus, there should be a total of (4 * #input) numbers.
@@ -306,7 +306,7 @@ message ParamSpec {
 // NOTE
 // Update the next available ID when you add a new LayerParameter field.
 //
-// LayerParameter next available layer-specific ID: 145 (last added: crop_param)
+// LayerParameter next available layer-specific ID: 153 (last added: bn_param)
 message LayerParameter {
   optional string name = 1; // the layer name
   optional string type = 2; // the layer type
@@ -328,12 +328,7 @@ message LayerParameter {
   // The blobs containing the numeric parameters of the layer.
   repeated BlobProto blobs = 7;
 
-  // Specifies whether to backpropagate to each bottom. If unspecified,
-  // Caffe will automatically infer whether each input needs backpropagation
-  // to compute parameter gradients. If set to true for some inputs,
-  // backpropagation to those inputs is forced; if set false for some inputs,
-  // backpropagation to those inputs is skipped.
-  //
+  // Specifies on which bottoms the backpropagation should be skipped.
   // The size must be either 0 or equal to the number of bottoms.
   repeated bool propagate_down = 11;
 
@@ -359,14 +354,18 @@ message LayerParameter {
   // engine parameter for selecting the implementation.
   // The default for the engine is set by the ENGINE switch at compile-time.
   optional AccuracyParameter accuracy_param = 102;
+  optional AdaptiveBiasChannelParameter adaptive_bias_channel_param = 148;
   optional ArgMaxParameter argmax_param = 103;
   optional BatchNormParameter batch_norm_param = 139;
+  optional BNParameter bn_param = 152;
   optional BiasParameter bias_param = 141;
+  optional BiasChannelParameter bias_channel_param = 149;
   optional ConcatParameter concat_param = 104;
   optional ContrastiveLossParameter contrastive_loss_param = 105;
   optional ConvolutionParameter convolution_param = 106;
-  optional CropParameter crop_param = 144;
   optional DataParameter data_param = 107;
+  optional DenseCRFParameter dense_crf_param = 146;
+  optional DomainTransformParameter domain_transform_param = 147;
   optional DropoutParameter dropout_param = 108;
   optional DummyDataParameter dummy_data_param = 109;
   optional EltwiseParameter eltwise_param = 110;
@@ -380,9 +379,11 @@ message LayerParameter {
   optional ImageDataParameter image_data_param = 115;
   optional InfogainLossParameter infogain_loss_param = 116;
   optional InnerProductParameter inner_product_param = 117;
-  optional InputParameter input_param = 143;
+  optional InterpParameter interp_param = 143;
   optional LogParameter log_param = 134;
   optional LRNParameter lrn_param = 118;
+  optional MatReadParameter mat_read_param = 151;
+  optional MatWriteParameter mat_write_param = 145;
   optional MemoryDataParameter memory_data_param = 119;
   optional MVNParameter mvn_param = 120;
   optional PoolingParameter pooling_param = 121;
@@ -392,16 +393,16 @@ message LayerParameter {
   optional ReductionParameter reduction_param = 136;
   optional ReLUParameter relu_param = 123;
   optional ReshapeParameter reshape_param = 133;
-  optional ROIPoolingParameter roi_pooling_param = 8266711;
   optional ScaleParameter scale_param = 142;
+  optional SegAccuracyParameter seg_accuracy_param = 144;
   optional SigmoidParameter sigmoid_param = 124;
-  optional SmoothL1LossParameter smooth_l1_loss_param = 8266712;
   optional SoftmaxParameter softmax_param = 125;
   optional SPPParameter spp_param = 132;
   optional SliceParameter slice_param = 126;
   optional TanHParameter tanh_param = 127;
   optional ThresholdParameter threshold_param = 128;
   optional TileParameter tile_param = 138;
+  optional UniqueLabelParameter unique_label_param = 150;
   optional WindowDataParameter window_data_param = 129;
 }
 
@@ -426,6 +427,13 @@ message TransformationParameter {
   optional bool force_color = 6 [default = false];
   // Force the decoded image to have 1 color channels.
   optional bool force_gray = 7 [default = false];
+  // If we want to do data augmentation, Scaling factor for randomly scaling input images
+  repeated float scale_factors = 8;
+  // the width for cropped region
+  optional uint32 crop_width = 9 [default = 0];
+  // the height for cropped region
+  optional uint32 crop_height = 10 [default = 0];
+
 }
 
 // Message that stores parameters shared by loss layers
@@ -440,7 +448,7 @@ message LossParameter {
     // Outputs that receive the ignore label will NOT be ignored in computing
     // the normalization factor.
     FULL = 0;
-    // Divide by the total number of output locations that do not take the
+    // Divide by the total number of output locations that do not take the 
     // ignore_label.  If ignore_label is not set, this behaves like FULL.
     VALID = 1;
     // Divide by the batch size.
@@ -475,6 +483,14 @@ message AccuracyParameter {
   optional int32 ignore_label = 3;
 }
 
+message AdaptiveBiasChannelParameter {
+  optional int32 num_iter = 1 [default = 1];
+  optional float bg_portion = 2 [default = 0.2];
+  optional float fg_portion = 3 [default = 0.2];
+  optional bool suppress_others = 4 [default = true];
+  optional float margin_others = 5 [default = 1e-5];
+}
+
 message ArgMaxParameter {
   // If true produce pairs (argmax, maxval)
   optional bool out_max_val = 1 [default = false];
@@ -484,6 +500,22 @@ message ArgMaxParameter {
   // By default ArgMaxLayer maximizes over the flattened trailing dimensions
   // for each index of the first / num dimension.
   optional int32 axis = 3;
+}
+
+message BiasChannelParameter {
+  // Score biases. Separate values for BG / FG
+  optional float bg_bias = 1 [default = 1.];
+  optional float fg_bias = 2 [default = 2.];
+  // will ignore labels with this value when adding bias
+  repeated int32 ignore_label = 3;
+  enum LabelType {
+    IMAGE = 1;
+    PIXEL = 2;
+  }
+  optional LabelType label_type = 4 [default = IMAGE];
+  // If the dataset defines generic background label or not.
+  // The default value is defined for PASCAL VOC segmentation
+  optional int32 background_label = 6 [default = 0];
 }
 
 message ConcatParameter {
@@ -507,6 +539,24 @@ message BatchNormParameter {
   // Small value to add to the variance estimate so that we don't divide by
   // zero.
   optional float eps = 3 [default = 1e-5];
+  optional bool update_global_stats = 4 [default = false];
+}
+
+message BNParameter {
+  optional FillerParameter slope_filler = 1;
+  optional FillerParameter bias_filler = 2;
+  optional float momentum = 3 [default = 0.9];
+  optional float eps = 4 [default = 1e-5];
+  // If true, will use the moving average mean and std for training and test.
+  // Will override the lr_param and freeze all the parameters.
+  // Make sure to initialize the layer properly with pretrained parameters.
+  optional bool frozen = 5 [default = false];
+  enum Engine {
+    DEFAULT = 0;
+    CAFFE = 1;
+    CUDNN = 2;
+  }
+  optional Engine engine = 6 [default = DEFAULT];
 }
 
 message BiasParameter {
@@ -606,24 +656,6 @@ message ConvolutionParameter {
   optional bool force_nd_im2col = 17 [default = false];
 }
 
-message CropParameter {
-  // To crop, elements of the first bottom are selected to fit the dimensions
-  // of the second, reference bottom. The crop is configured by
-  // - the crop `axis` to pick the dimensions for cropping
-  // - the crop `offset` to set the shift for all/each dimension
-  // to align the cropped bottom with the reference bottom.
-  // All dimensions up to but excluding `axis` are preserved, while
-  // the dimensions including and trailing `axis` are cropped.
-  // If only one `offset` is set, then all dimensions are offset by this amount.
-  // Otherwise, the number of offsets must equal the number of cropped axes to
-  // shift the crop in each dimension accordingly.
-  // Note: standard dimensions are N,C,H,W so the default is a spatial crop,
-  // and `axis` may be negative to index from the end (e.g., -1 for the last
-  // axis).
-  optional int32 axis = 1 [default = 2];
-  repeated uint32 offset = 2;
-}
-
 message DataParameter {
   enum DB {
     LEVELDB = 0;
@@ -658,9 +690,33 @@ message DataParameter {
   optional uint32 prefetch = 10 [default = 4];
 }
 
+message DenseCRFParameter {
+  // max number of iteration for message passing
+  optional int32 max_iter = 1 [default = 10];
+  // positional std and weight for "Positional" filter (color-independent)
+  repeated float pos_xy_std = 2;
+  repeated float pos_w = 3;
+  // positional std, color std and weight for Bilateral filter
+  repeated float bi_xy_std = 4;
+  repeated float bi_rgb_std = 5;
+  repeated float bi_w = 6; 
+  // output is probability or score (score = log(prob))
+  optional bool output_probability = 7 [default = true];
+}
+
+message DomainTransformParameter {
+  // Max number of iteration for filtering.
+  optional int32 num_iter = 1 [default = 3];
+  // Standard deviation for spatial domain.
+  optional float spatial_sigma = 2 [default = 50];
+  // Standard deviation for range domain.
+  optional float range_sigma = 3 [default = 5];
+  // minimum weight value (to avoid zero gradient for ref_grad_data)
+  optional float min_weight = 4 [default = 0];
+}
+
 message DropoutParameter {
   optional float dropout_ratio = 1 [default = 0.5]; // dropout ratio
-  optional bool scale_train = 2 [default = true];  // scale train or test phase
 }
 
 // DummyDataLayer fills any number of arbitrarily shaped blobs with random
@@ -699,7 +755,7 @@ message EltwiseParameter {
 // Message that stores parameters used by ELULayer
 message ELUParameter {
   // Described in:
-  // Clevert, D.-A., Unterthiner, T., & Hochreiter, S. (2015). Fast and Accurate
+  // Clevert, D.-A., Unterthiner, T., & Hochreiter, S. (2015). Fast and Accurate 
   // Deep Network Learning by Exponential Linear Units (ELUs). arXiv
   optional float alpha = 1 [default = 1];
 }
@@ -785,6 +841,16 @@ message ImageDataParameter {
   optional uint32 new_width = 10 [default = 0];
   // Specify if the images are color or gray
   optional bool is_color = 11 [default = true];
+
+  // This is the value set for pixels or images where we don't know the label
+  optional int32 ignore_label = 15 [default = 255];
+  enum LabelType {
+    NONE = 0;
+    IMAGE = 1;
+    PIXEL = 2;
+  }
+  optional LabelType label_type = 16 [default = IMAGE];
+
   // DEPRECATED. See TransformationParameter. For data pre-processing, we can do
   // simple scaling and subtracting the data mean, if provided. Note that the
   // mean subtraction is always carried out before scaling.
@@ -821,12 +887,14 @@ message InnerProductParameter {
   optional bool transpose = 6 [default = false];
 }
 
-message InputParameter {
-  // This layer produces N >= 1 top blob(s) to be assigned manually.
-  // Define N shapes to set a shape for each top.
-  // Define 1 shape to set the same shape for every top.
-  // Define no shape to defer to reshaping manually.
-  repeated BlobShape shape = 1;
+message InterpParameter {
+  optional int32 height = 1 [default = 0]; // Height of output
+  optional int32 width = 2 [default = 0]; // Width of output
+  optional int32 zoom_factor = 3 [default = 1]; // zoom factor
+  optional int32 shrink_factor = 4 [default = 1]; // shrink factor
+  optional int32 pad_beg = 5 [default = 0]; // padding at begin of input
+  optional int32 pad_end = 6 [default = 0]; // padding at end of input
+  optional  bool use_blob_size = 7 [default = false];// whether use another blob's size to resize the first one
 }
 
 // Message that stores parameters used by LogLayer
@@ -856,6 +924,20 @@ message LRNParameter {
     CUDNN = 2;
   }
   optional Engine engine = 6 [default = DEFAULT];
+}
+
+message MatReadParameter {
+  required string prefix = 1;
+  optional string source = 2 [default = ""];
+  optional int32 strip = 3 [default = 0];
+  optional int32 batch_size = 4 [default = 1];
+}
+
+message MatWriteParameter {
+  required string prefix = 1;
+  optional string source = 2 [default = ""];
+  optional int32 strip = 3 [default = 0];
+  optional int32 period = 4 [default = 1];
 }
 
 message MemoryDataParameter {
@@ -1035,17 +1117,6 @@ message ReshapeParameter {
   optional int32 num_axes = 3 [default = -1];
 }
 
-// Message that stores parameters used by ROIPoolingLayer
-message ROIPoolingParameter {
-  // Pad, kernel size, and stride are all given as a single value for equal
-  // dimensions in height and width or as Y, X pairs.
-  optional uint32 pooled_h = 1 [default = 0]; // The pooled output height
-  optional uint32 pooled_w = 2 [default = 0]; // The pooled output width
-  // Multiplicative spatial scale factor to translate ROI coords from their
-  // input scale to the scale used when pooling
-  optional float spatial_scale = 3 [default = 1];
-}
-
 message ScaleParameter {
   // The first axis of bottom[0] (the first input Blob) along which to apply
   // bottom[1] (the second input Blob).  May be negative to index from the end
@@ -1083,6 +1154,18 @@ message ScaleParameter {
   optional FillerParameter bias_filler = 5;
 }
 
+message SegAccuracyParameter {
+  enum AccuracyMetric {
+    PixelAccuracy = 0;
+    ClassAccuracy = 1;
+    PixelIOU = 2;
+  }
+  optional AccuracyMetric metric = 1 [default = PixelAccuracy];
+  // will ignore pixels with this value when computing accuracy
+  repeated int32 ignore_label = 2;
+  optional bool reset = 3 [default = true];
+}
+
 message SigmoidParameter {
   enum Engine {
     DEFAULT = 0;
@@ -1090,13 +1173,6 @@ message SigmoidParameter {
     CUDNN = 2;
   }
   optional Engine engine = 1 [default = DEFAULT];
-}
-
-message SmoothL1LossParameter {
-  // SmoothL1Loss(x) =
-  //   0.5 * (sigma * x) ** 2    -- if x < 1.0 / sigma / sigma
-  //   |x| - 0.5 / sigma / sigma -- otherwise
-  optional float sigma = 1 [default = 1];
 }
 
 message SliceParameter {
@@ -1146,6 +1222,12 @@ message TileParameter {
 // Message that stores parameters used by ThresholdLayer
 message ThresholdParameter {
   optional float threshold = 1 [default = 0]; // Strictly positive values
+}
+
+message UniqueLabelParameter {
+  required int32 max_labels = 1;
+  repeated int32 ignore_label = 2;
+  repeated float force_label = 3;
 }
 
 message WindowDataParameter {

@@ -15,7 +15,7 @@ set(ncnn_SRCS
     mat_pixel.cpp
     net.cpp
     opencv.cpp
-        layer/resize.cpp layer/resize.h)
+        layer/interp.cpp layer/interp.h)
 
 macro(ncnn_add_layer class)
     string(TOLOWER ${class} name)
@@ -80,8 +80,7 @@ file(REMOVE ${CMAKE_CURRENT_BINARY_DIR}/layer_registry.h)
 
 # layer implementation
 ncnn_add_layer(AbsVal)
-#ncnn_add_layer(ArgMax OFF)
-ncnn_add_layer(ArgMax)
+ncnn_add_layer(ArgMax OFF)
 ncnn_add_layer(BatchNorm)
 ncnn_add_layer(Bias)
 ncnn_add_layer(BNLL)
@@ -105,16 +104,11 @@ ncnn_add_layer(Pooling)
 ncnn_add_layer(Power)
 ncnn_add_layer(PReLU)
 ncnn_add_layer(Proposal)
-#ncnn_add_layer(Proposal OFF)
-ncnn_add_layer(Reduction)
-#ncnn_add_layer(Reduction OFF)
+ncnn_add_layer(Reduction OFF)
 ncnn_add_layer(ReLU)
 ncnn_add_layer(Reshape)
 ncnn_add_layer(ROIPooling OFF)
 ncnn_add_layer(Reshape)
-#ncnn_add_layer(Reshape OFF)
-ncnn_add_layer(ROIPooling)
-#ncnn_add_layer(ROIPooling OFF)
 ncnn_add_layer(Scale)
 ncnn_add_layer(Sigmoid)
 ncnn_add_layer(Slice)
