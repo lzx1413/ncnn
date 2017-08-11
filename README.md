@@ -37,6 +37,10 @@ ncnn is a high-performance neural network inference computing framework optimize
 * Well, it is strong, not afraid of being stuffed with 卷   QvQ
 
 ---
+### change log
+20170811 add interp function bilinear and nearest
+
+---
 
 ### License
 
