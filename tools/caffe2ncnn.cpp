@@ -502,7 +502,7 @@ int main(int argc, char** argv)
             auto width_scale = height_scale;
             auto output_width = interp_param.width();
             auto output_height = interp_param.height();
-            fprintf(pp,"%d %f %f %d %d", 2, height_scale, width_scale,output_width,output_height);
+            fprintf(pp," %d %f %f %d %d", 2, 1.0,1.0,177,177);
 
         }
         else if (layer.type() == "Deconvolution")

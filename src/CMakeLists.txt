@@ -15,7 +15,7 @@ set(ncnn_SRCS
     mat_pixel.cpp
     net.cpp
     opencv.cpp
-        layer/interp.cpp layer/interp.h)
+    )
 
 macro(ncnn_add_layer class)
     string(TOLOWER ${class} name)
@@ -122,7 +122,7 @@ ncnn_add_layer(RNN OFF)
 ncnn_add_layer(LSTM OFF)
 ncnn_add_layer(BinaryOp)
 ncnn_add_layer(UnaryOp)
-ncnn_add_layer(Resize)
+ncnn_add_layer(Interp)
 
 
 add_library(ncnn STATIC ${ncnn_SRCS})

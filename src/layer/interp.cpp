@@ -21,8 +21,8 @@ namespace ncnn {
 #if NCNN_STRING
 
     int Interp::load_param(FILE *paramfp) {
-        int nscan = fscanf(paramfp, "%d %f %f %d %d", &type, &height_scale_, &width_scale_,&output_width_,&output_height_);
-        if (nscan != 3) {
+        int nscan = fscanf(paramfp, " %d %f %f %d %d", &resize_type_, &height_scale_, &width_scale_,&output_width_,&output_height_);
+        if (nscan != 5) {
             fprintf(stderr, "Interp load_param failed %d\n", nscan);
             return -1;
         }
@@ -49,9 +49,9 @@ namespace ncnn {
         mem += 4;
         width_scale_ = *(float *) (mem);
         mem += 4;
-        output_height_ = *(float *) (mem);
+        output_height_ = *(int *) (mem);
         mem += 4;
-        output_width_ = *(float *) (mem);
+        output_width_ = *(int *) (mem);
         mem += 4;
         return 0;
     }
@@ -103,9 +103,11 @@ namespace ncnn {
         }
     }
 
-    void bilinear_cpu_interp2(const int channels,
-                           const float *data1, const int x1, const int y1, const int height1, const int width1, const int Height1, const int Width1,
-                           float *data2, const int x2, const int y2, const int height2, const int width2, const int Height2, const int Width2) {
+    void bilinear_interp(const int channels,
+                         const float *data1, const int x1, const int y1, const int height1, const int width1,
+                         const int Height1, const int Width1,
+                         float *data2, const int x2, const int y2, const int height2, const int width2,
+                         const int Height2, const int Width2) {
         assert(x1 >= 0 && y1 >= 0 && height1 > 0 && width1 > 0 && x2 >= 0 && y2 >= 0 && height2 > 0 && width2 > 0);
         assert(Width1 >= width1 + x1 && Height1 >= height1 + y1 && Width2 >= width2 + x2 && Height2 >= height2 + y2);
         // special case: just copy
@@ -161,36 +163,39 @@ namespace ncnn {
             output_height = h * height_scale_;
             output_width = w * width_scale_;
         }
-        top_blobs.reshape(output_width, output_height, c);
+        top_blobs.create(output_width, output_height, c);
         if (resize_type_ == 1)//nearneast
         {
             if ((width_scale_ == 2.0 && height_scale_ == 2.0) || (output_height / h == 2 && output_width / w == 2)) {
                 resizeNearest2x(1, c, h, w, bottom_blobs.data, top_blobs.data);
                 return 0;
             }
-            auto bottom_ptr = bottom_blobs.data;
-            for (int n = 0; n < 1; ++n) {
-                for (int c = 0; c < c; ++c) {
-                    for (int y = 0; y < output_height; ++y) {
-                        const int in_y = std::min((int) (y / height_scale_), (h - 1));
-                        for (int x = 0; x < output_width; ++x) {
-                            const int in_x = std::min((int) (x / width_scale_), (w - 1));
-                            top_blobs.data[output_width * y + x] = bottom_ptr[in_y * w + in_x];
+            else {
+                auto bottom_ptr = bottom_blobs.data;
+                for (int n = 0; n < 1; ++n) {
+                    for (int c = 0; c < c; ++c) {
+                        for (int y = 0; y < output_height; ++y) {
+                            const int in_y = std::min((int) (y / height_scale_), (h - 1));
+                            for (int x = 0; x < output_width; ++x) {
+                                const int in_x = std::min((int) (x / width_scale_), (w - 1));
+                                top_blobs.data[output_width * y + x] = bottom_ptr[in_y * w + in_x];
+                            }
                         }
+                        bottom_ptr += h * w;
+                        top_blobs.data += output_width * output_height;
                     }
-                    bottom_ptr += h * w;
-                    top_blobs.data += output_width * output_height;
-                }
+             }
+                return 0;
             }
-            return 0;
         }
         else if (resize_type_ == 2)// bilinear
         {
-            bilinear_cpu_interp2(c,bottom_blobs.data,0,0,h,w,h,w,top_blobs.data,0,0,output_height,output_width,output_height,output_width);
+            bilinear_interp(c, bottom_blobs.data, 0, 0, h, w, h, w, top_blobs.data, 0, 0, output_height, output_width,
+                            output_height, output_width);
             return 0;
         }
         else{
-            fprintf(stderr, "unsupported resize type\n");
+            fprintf(stderr, "unsupported resize type %d %d %d\n",&resize_type_,output_height,output_width);
             return -1;
         }
     }
