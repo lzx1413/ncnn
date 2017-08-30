@@ -24,8 +24,8 @@
 static int detect_squeezenet(const cv::Mat& bgr, std::vector<float>& cls_scores)
 {
     ncnn::Net squeezenet;
-    squeezenet.load_param("psp_sqz3.param");
-    squeezenet.load_model("psp_sqz3.bin");
+    squeezenet.load_param("psp_sqz3_bi.param");
+    squeezenet.load_model("psp_sqz3_bi.bin");
 
     ncnn::Mat in = ncnn::Mat::from_pixels_resize(bgr.data, ncnn::Mat::PIXEL_BGR, bgr.cols, bgr.rows, 177, 177);
 
@@ -39,7 +39,7 @@ static int detect_squeezenet(const cv::Mat& bgr, std::vector<float>& cls_scores)
 
     ncnn::Mat out;
     //ex.extract("prob", out);
-    ex.extract("score_ft", out);
+    ex.extract("score_interp", out);
 
     using namespace std;
     cout<<"w"<<out.w<<"h"<<out.h<<"c"<<out.c<<endl;
