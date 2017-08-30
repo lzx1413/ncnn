@@ -324,8 +324,19 @@ int main(int argc, char** argv)
 
         // layer definition line, repeated
         // [type] [name] [bottom blob count] [top blob count] [bottom blobs] [top blobs] [layer specific params]
-        fprintf(pp, "%-16s %-16s %d %d", layer.type().c_str(), layer.name().c_str(), layer.bottom_size(), layer.top_size());
-        cout<<layer.type().c_str()<<"\t"<<layer.name().c_str()<<"\t"<<layer.bottom_size()<<"\t"<<layer.top_size()<<endl;
+        if (layer.type() == "Convolution")
+        {
+            const caffe::ConvolutionParameter& convolution_param = layer.convolution_param();
+            if (convolution_param.group() != 1)
+                fprintf(pp, "%-16s", "ConvolutionDepthWise");
+            else
+                fprintf(pp, "%-16s", "Convolution");
+        }
+        else
+        {
+            fprintf(pp, "%-16s", layer.type().c_str());
+        }
+        fprintf(pp, " %-16s %d %d", layer.name().c_str(), layer.bottom_size(), layer.top_size());
 
         for (int j=0; j<layer.bottom_size(); j++)
         {
@@ -432,6 +443,11 @@ int main(int argc, char** argv)
                     convolution_param.pad_size() != 0 ? convolution_param.pad(0) : 0,
                     convolution_param.bias_term(),
                     weight_blob.data_size());
+
+            if (convolution_param.group() != 1)
+            {
+                fprintf(pp, " %d", convolution_param.group());
+            }
 
             for (int j = 0; j < binlayer.blobs_size(); j++)
             {
@@ -549,6 +565,11 @@ int main(int argc, char** argv)
             {
                 fprintf(pp, " %f", eltwise_param.coeff(j));
             }
+        }
+        else if (layer.type() == "ELU")
+        {
+            const caffe::ELUParameter& elu_param = layer.elu_param();
+            fprintf(pp, " %f", elu_param.alpha());
         }
         else if (layer.type() == "InnerProduct")
         {

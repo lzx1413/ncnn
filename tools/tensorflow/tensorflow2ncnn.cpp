@@ -226,6 +226,10 @@ int main(int argc, char** argv)
         {
             fprintf(pp, "%-16s", "Pooling");
         }
+        else if (node.op() == "Concat" || node.op() == "ConcatV2")
+        {
+            fprintf(pp, "%-16s", "Concat");
+        }
         else if (node.op() == "Const")
         {
             continue;
@@ -249,13 +253,26 @@ int main(int argc, char** argv)
                 continue;
             }
         }
+        else if (node.op() == "LRN")
+        {
+            fprintf(pp, "%-16s", "LRN");
+        }
         else if (node.op() == "MatMul")
         {
             fprintf(pp, "%-16s", "InnerProduct");
         }
         else if (node.op() == "Max")
         {
-            fprintf(pp, "%-16s", "BinaryOp");
+            // check weights
+            tensorflow::TensorProto tensor;
+            if (find_tensor_proto(weights, node, tensor))
+            {
+                fprintf(pp, "%-16s", "Reduction");
+            }
+            else
+            {
+                fprintf(pp, "%-16s", "BinaryOp");
+            }
         }
         else if (node.op() == "MaxPool")
         {
@@ -310,9 +327,14 @@ int main(int argc, char** argv)
         {
             fprintf(pp, "%-16s", "BinaryOp");
         }
+        else if (node.op() == "Sum")
+        {
+            fprintf(pp, "%-16s", "Reduction");
+        }
         else
         {
             fprintf(pp, "%-16s", node.op().c_str());
+            fprintf(stderr, "%s not supported yet !\nn", node.op().c_str());
         }
 
         int input_size = node.input_size();
@@ -433,6 +455,15 @@ int main(int argc, char** argv)
 
             fprintf(pp, " %d %d %d %d %d", pooling_type, kernel_size_w, stride_w, pad, global_pooling);
         }
+        else if (node.op() == "Concat" || node.op() == "ConcatV2")
+        {
+            tensorflow::TensorProto tensor;
+            if (find_tensor_proto(weights, node, tensor))
+            {
+                // TODO
+                int axis = tensor.int_val(0);
+            }
+        }
         else if (node.op() == "Const")
         {
         }
@@ -538,6 +569,41 @@ int main(int argc, char** argv)
         else if (node.op() == "Identity")
         {
         }
+        else if (node.op() == "LRN")
+        {
+            int norm_region = 0;
+            int local_size = 1;
+            float alpha = 1.f;
+            float beta = 0.5f;
+
+            tensorflow::AttrValue value_depth_radius;
+            if (find_attr_value(node, "depth_radius", value_depth_radius))
+            {
+                local_size = value_depth_radius.i() * 2 + 1;
+            }
+
+            tensorflow::AttrValue value_alpha;
+            if (find_attr_value(node, "alpha", value_alpha))
+            {
+                alpha = value_alpha.f();
+            }
+
+            tensorflow::AttrValue value_beta;
+            if (find_attr_value(node, "beta", value_beta))
+            {
+                beta = value_beta.f();
+            }
+
+            // TODO
+            float bias = 1.f;
+            tensorflow::AttrValue value_bias;
+            if (find_attr_value(node, "bias", value_bias))
+            {
+                bias = value_bias.f();
+            }
+
+            fprintf(pp, " %d %d %f %f", norm_region, local_size, alpha, beta);
+        }
         else if (node.op() == "MatMul")
         {
             // weights
@@ -594,8 +660,27 @@ int main(int argc, char** argv)
         }
         else if (node.op() == "Max")
         {
-            int op_type = 4;
-            fprintf(pp, " %d", op_type);
+            // check weights
+            tensorflow::TensorProto tensor;
+            if (find_tensor_proto(weights, node, tensor))
+            {
+                int operation = 4;
+                int dim = 0;
+                float coeff = 1.f;
+
+                int axis = tensor.int_val(0);
+                if (axis == 1)
+                    dim = 0;
+                else if (axis == 3)
+                    dim = -2;
+
+                fprintf(pp, " %d %d %f", operation, dim, coeff);
+            }
+            else
+            {
+                int op_type = 4;
+                fprintf(pp, " %d", op_type);
+            }
         }
         else if (node.op() == "MaxPool")
         {
@@ -748,6 +833,25 @@ int main(int argc, char** argv)
         {
             int op_type = 1;
             fprintf(pp, " %d", op_type);
+        }
+        else if (node.op() == "Sum")
+        {
+            int operation = 0;
+            int dim = 0;
+            float coeff = 1.f;
+
+            // check weights
+            tensorflow::TensorProto tensor;
+            if (find_tensor_proto(weights, node, tensor))
+            {
+                int axis = tensor.int_val(0);
+                if (axis == 1)
+                    dim = 0;
+                else if (axis == 3)
+                    dim = -2;
+            }
+
+            fprintf(pp, " %d %d %f", operation, dim, coeff);
         }
         else
         {

@@ -133,7 +133,8 @@ enum
     Resize      = 42,
     BinaryOp    = 40,
     UnaryOp     = 41,
-
+    ConvolutionDepthWise = 42,
+    Interp     = 43,
     CustomBit   = (1<<8),
 };
 } // namespace LayerType

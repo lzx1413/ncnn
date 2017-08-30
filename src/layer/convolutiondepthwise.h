@@ -12,18 +12,19 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
-#ifndef LAYER_REDUCTION_H
-#define LAYER_REDUCTION_H
+#ifndef LAYER_CONVOLUTIONDEPTHWISE_H
+#define LAYER_CONVOLUTIONDEPTHWISE_H
 
 #include "layer.h"
+#include "convolution.h"
 
 namespace ncnn {
 
-class Reduction : public Layer
+class ConvolutionDepthWise : public Convolution
 {
 public:
-    Reduction();
-    virtual ~Reduction();
+    ConvolutionDepthWise();
+    virtual ~ConvolutionDepthWise();
 
 #if NCNN_STDIO
 #if NCNN_STRING
@@ -33,24 +34,12 @@ public:
 #endif // NCNN_STDIO
     virtual int load_param(const unsigned char*& mem);
 
-    virtual int forward(const Mat& bottom_blob, Mat& top_blob) const;
-
-    enum {
-        ReductionOp_SUM     = 0,
-        ReductionOp_ASUM    = 1,
-        ReductionOp_SUMSQ   = 2,
-        ReductionOp_MEAN    = 3,
-        ReductionOp_MAX     = 4,
-        ReductionOp_MIN     = 5
-    };
+    virtual int forward(const Mat& bottom_blobs, Mat& top_blobs) const;
 
 public:
-    // param
-    int operation;
-    int dim;
-    float coeff;
+    int group;
 };
 
 } // namespace ncnn
 
-#endif // LAYER_REDUCTION_H
+#endif // LAYER_CONVOLUTIONDEPTHWISE_H
