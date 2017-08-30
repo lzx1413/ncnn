@@ -1943,7 +1943,7 @@ Mat Mat::from_pixels(const unsigned char* pixels, int type, int w, int h)
 {
     if (type & PIXEL_CONVERT_MASK)
     {
-        if (type == PIXEL_RGB2BGR || type == PIXEL_BGR2RGB
+        if (type == PIXEL_RGB2BGR || type == PIXEL_BGR2RGB)
             return from_rgb2bgr(pixels, w, h);
 
         if (type == PIXEL_RGB2GRAY)

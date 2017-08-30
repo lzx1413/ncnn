@@ -190,8 +190,9 @@ namespace ncnn {
         }
         else if (resize_type_ == 2)// bilinear
         {
-            bilinear_interp(c, bottom_blobs.data, 0, 0, h, w, h, w, top_blobs.data, 0, 0, output_height, output_width,
-                            output_height, output_width);
+            //bilinear_interp(c, bottom_blobs.data, 0, 0, h, w, h, w, top_blobs.data, 0, 0, output_height, output_width,
+            //               output_height, output_width);
+            resize_bilinear(bottom_blobs,top_blobs,output_width,output_height);
             return 0;
         }
         else{
