@@ -73,6 +73,7 @@ int MVN::forward(const Mat& bottom_blob, Mat& top_blob) const
     int channels = bottom_blob.c;
     int size = w * h;
 
+
     top_blob.create(w, h, channels);
     if (top_blob.empty())
         return -100;
@@ -200,7 +201,7 @@ int MVN::forward(const Mat& bottom_blob, Mat& top_blob) const
 
                 for (int i=0; i<size; i++)
                 {
-                    outptr[i] = ptr[i] * norm_var_inv;
+                    outptr[i] = outptr[i] * norm_var_inv;
                 }
             }
         }

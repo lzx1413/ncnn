@@ -35,9 +35,9 @@ public:
     virtual int forward(const Mat& bottom_blob, Mat& top_blob) const;
 
 public:
-    int normalize_variance;
-    int across_channels;
-    float eps;
+    int normalize_variance = 1;
+    int across_channels = 0;
+    float eps = 1e-9;
 };
 
 } // namespace ncnn

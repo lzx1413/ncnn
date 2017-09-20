@@ -104,14 +104,14 @@ public class MainActivity extends Activity
         byte[] words = null;
 
         {
-            InputStream assetsInputStream = getAssets().open("squeezenet_v1.1.param.bin");
+            InputStream assetsInputStream = getAssets().open("mobilenet.param.bin");
             int available = assetsInputStream.available();
             param = new byte[available];
             int byteCode = assetsInputStream.read(param);
             assetsInputStream.close();
         }
         {
-            InputStream assetsInputStream = getAssets().open("squeezenet_v1.1.bin");
+            InputStream assetsInputStream = getAssets().open("mobilenet.bin");
             int available = assetsInputStream.available();
             bin = new byte[available];
             int byteCode = assetsInputStream.read(bin);

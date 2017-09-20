@@ -16,9 +16,9 @@ project(ncnn)
 
 cmake_minimum_required(VERSION 2.8.10)
 
-# set(CMAKE_BUILD_TYPE debug)
+set(CMAKE_BUILD_TYPE debug)
 # set(CMAKE_BUILD_TYPE relwithdebinfo)
-set(CMAKE_BUILD_TYPE release)
+#set(CMAKE_BUILD_TYPE release)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 option(NCNN_OPENMP "openmp support" ON)
@@ -59,7 +59,7 @@ endif()
 
 ##############################################
 
-#add_subdirectory(examples)
+add_subdirectory(examples)
 add_subdirectory(src)
 if(NOT ANDROID AND NOT IOS)
 add_subdirectory(tools)

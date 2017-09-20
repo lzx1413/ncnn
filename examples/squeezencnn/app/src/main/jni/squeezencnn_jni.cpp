@@ -23,7 +23,8 @@
 // ncnn
 #include "net.h"
 
-#include "squeezenet_v1.1.id.h"
+//#include "squeezenet_v1.1.id.h"
+#include "mobilenet.id.h"
 
 #include <sys/time.h>
 #include <unistd.h>
@@ -132,16 +133,17 @@ JNIEXPORT jstring JNICALL Java_com_tencent_squeezencnn_SqueezeNcnn_Detect(JNIEnv
     std::vector<float> cls_scores;
     {
         const float mean_vals[3] = {104.f, 117.f, 123.f};
-        in.substract_mean_normalize(mean_vals, 0);
+        const float norm_vals[3] = {0.017f, 0.017f, 0.017f};
+        in.substract_mean_normalize(mean_vals, norm_vals);
 
         ncnn::Extractor ex = squeezenet.create_extractor();
         ex.set_light_mode(true);
-        ex.set_num_threads(4);
+        //ex.set_num_threads(4);
 
-        ex.input(squeezenet_v1_1_param_id::BLOB_data, in);
+        ex.input(mobilenet_param_id::BLOB_data, in);
 
         ncnn::Mat out;
-        ex.extract(squeezenet_v1_1_param_id::BLOB_prob, out);
+        ex.extract(mobilenet_param_id::BLOB_prob, out);
 
         cls_scores.resize(out.c);
         for (int j=0; j<out.c; j++)

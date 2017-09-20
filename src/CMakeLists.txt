@@ -15,7 +15,7 @@ set(ncnn_SRCS
     mat_pixel.cpp
     net.cpp
     opencv.cpp
-    )
+        )
 
 macro(ncnn_add_layer class)
     string(TOLOWER ${class} name)

@@ -20,38 +20,55 @@
 
 #include "net.h"
 #include <iostream>
+#include <cvaux.h>
 
 static int detect_squeezenet(const cv::Mat& bgr, std::vector<float>& cls_scores)
 {
+    cv::Mat resized_bgr;
+    cv::resize(bgr,resized_bgr,cv::Size(256,256));
     ncnn::Net squeezenet;
-    squeezenet.load_param("psp_sqz3_bi.param");
-    squeezenet.load_model("psp_sqz3_bi.bin");
+    squeezenet.load_param("style.param");
+    squeezenet.load_model("style.bin");
+    cv::imshow("input",bgr);
 
-    ncnn::Mat in = ncnn::Mat::from_pixels_resize(bgr.data, ncnn::Mat::PIXEL_BGR, bgr.cols, bgr.rows, 177, 177);
+    ncnn::Mat in = ncnn::Mat::from_pixels(resized_bgr.data, ncnn::Mat::PIXEL_BGR,resized_bgr.cols,resized_bgr.rows);
 
-    const float mean_vals[3] = {104.f, 117.f, 123.f};
+    const float mean_vals[3] = {103.939f, 116.779f, 123.68f};
+    const float minus_mean_vals[3] = {-104.f, -117.f, -123.f};
+    const float zero_mean_vals[3] = {0, 0, 0};
+    const float const_factors[3] = {150.0,150.0,150.0};
     in.substract_mean_normalize(mean_vals, 0);
 
     ncnn::Extractor ex = squeezenet.create_extractor();
-    ex.set_light_mode(false);
+    ex.set_light_mode(true);
 
     ex.input("data", in);
 
     ncnn::Mat out;
-    //ex.extract("prob", out);
-    ex.extract("score_interp", out);
+    ex.extract("output", out);
+    //ex.extract("score_interp", out);
 
     using namespace std;
     cout<<"w"<<out.w<<"h"<<out.h<<"c"<<out.c<<endl;
+    unsigned char result[512*512*3];
+    out.substract_mean_normalize(zero_mean_vals,const_factors);
+    out.substract_mean_normalize(minus_mean_vals,0);
+    out.to_pixels(result,ncnn::Mat::PIXEL_BGR);
+    int out_size = 512;
+    cv::Mat outmat(out_size,out_size,CV_8UC3,result);
+    //std::cout<<outmat.row(0)<<std::endl;
+    cv::imwrite("result1.png",outmat);
+    cv::imshow("result",outmat);
+    cv::waitKey();
     cls_scores.resize(out.c);
-    /*
+/*
     for (int j=0; j<out.c; j++)
     {
         const float* prob = out.data + out.cstep * j;
         cls_scores[j] = prob[0];
     }
-     */
 
+ */
 
     return 0;
 }
@@ -84,9 +101,11 @@ static int print_topk(const std::vector<float>& cls_scores, int topk)
 int main(int argc, char** argv)
 {
     //const char* imagepath = argv[1];
-    const char* imagepath = "dog.jpeg";
+    const char* imagepath = "ppj.jpg";
 
     cv::Mat m = cv::imread(imagepath, CV_LOAD_IMAGE_COLOR);
+
+    fprintf(stderr, "cv::imread %s \n", imagepath);
     if (m.empty())
     {
         fprintf(stderr, "cv::imread %s failed\n", imagepath);
@@ -96,7 +115,7 @@ int main(int argc, char** argv)
     std::vector<float> cls_scores;
     detect_squeezenet(m, cls_scores);
 
-    //print_topk(cls_scores, 3);
+    print_topk(cls_scores, 3);
 
     return 0;
 }
