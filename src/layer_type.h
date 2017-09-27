@@ -12,34 +12,19 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
-#ifndef LAYER_CONVOLUTIONDEPTHWISE_H
-#define LAYER_CONVOLUTIONDEPTHWISE_H
-
-#include "layer.h"
-#include "convolution.h"
+#ifndef NCNN_LAYER_TYPE_H
+#define NCNN_LAYER_TYPE_H
 
 namespace ncnn {
 
-class ConvolutionDepthWise : public Convolution
+namespace LayerType {
+enum
 {
-public:
-    ConvolutionDepthWise();
-    virtual ~ConvolutionDepthWise();
-
-#if NCNN_STDIO
-#if NCNN_STRING
-    virtual int load_param(FILE* paramfp);
-#endif // NCNN_STRING
-    virtual int load_param_bin(FILE* paramfp);
-#endif // NCNN_STDIO
-    virtual int load_param(const unsigned char*& mem);
-
-    virtual int forward(const Mat& bottom_blob, Mat& top_blob) const;
-
-public:
-    int group;
+#include "layer_type_enum.h"
+    CustomBit = (1<<8),
 };
+} // namespace LayerType
 
 } // namespace ncnn
 
-#endif // LAYER_CONVOLUTIONDEPTHWISE_H
+#endif // NCNN_LAYER_TYPE_H
