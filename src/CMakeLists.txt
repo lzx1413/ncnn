@@ -15,7 +15,7 @@ set(ncnn_SRCS
     mat_pixel.cpp
     net.cpp
     opencv.cpp
-        )
+        layer/priorbox.cpp layer/priorbox.h layer/detectionoutput.cpp layer/detectionoutput.h permute.cpp permute.h)
 
 macro(ncnn_add_layer class)
     string(TOLOWER ${class} name)
