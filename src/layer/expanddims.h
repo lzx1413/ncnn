@@ -12,38 +12,34 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
-#ifndef LAYER_MEMORYDATA_H
-#define LAYER_MEMORYDATA_H
+#ifndef LAYER_EXPANDDIMS_H
+#define LAYER_EXPANDDIMS_H
 
 #include "layer.h"
 
 namespace ncnn {
 
-class MemoryData : public Layer
+class ExpandDims : public Layer
 {
 public:
-    MemoryData();
+    ExpandDims();
 
 #if NCNN_STDIO
 #if NCNN_STRING
     virtual int load_param(FILE* paramfp);
 #endif // NCNN_STRING
     virtual int load_param_bin(FILE* paramfp);
-    virtual int load_model(FILE* binfp);
 #endif // NCNN_STDIO
     virtual int load_param(const unsigned char*& mem);
-    virtual int load_model(const unsigned char*& mem);
 
-    virtual int forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_blobs) const;
+    virtual int forward(const Mat& bottom_blob, Mat& top_blob) const;
 
 public:
-    int w;
-    int h;
-    int c;
-
-    Mat data;
+    int expand_w;
+    int expand_h;
+    int expand_c;
 };
 
 } // namespace ncnn
 
-#endif // LAYER_MEMORYDATA_H
+#endif // LAYER_EXPANDDIMS_H
