@@ -17,7 +17,7 @@ set(ncnn_SRCS
     mat.cpp
     mat_pixel.cpp
     net.cpp
-    opencv.cpp utils/bbox_util.cpp utils/bbox_util.h )
+    opencv.cpp utils/bbox_util.cpp utils/bbox_util.h utils/NormalizedBBox.cpp utils/NormalizedBBox.h)
 
 macro(ncnn_add_layer class)
     string(TOLOWER ${class} name)

@@ -16,8 +16,6 @@
 #define LAYER_DETECTIONOUTPUT_H
 
 #include "layer.h"
-#include "caffe.pb.h"
-
 namespace ncnn {
 
     class DetectionOutput : public Layer
