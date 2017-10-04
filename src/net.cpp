@@ -97,23 +97,8 @@ namespace ncnn {
         int blob_count = 0;
         fscanf(fp, "%d %d", &layer_count, &blob_count);
 
-        int typeindex = layer_to_index(layer_type);
-        Layer* layer = create_layer(typeindex);
-        if (!layer)
-        {
-            typeindex = custom_layer_to_index(layer_type);
-            layer = create_custom_layer(typeindex);
-        }
-        if (!layer)
-        {
-            fprintf(stderr, "layer %s not exists or registered\n", layer_type);
-            clear();
-            return -1;
-        }
-
-        layer->type = std::string(layer_type);
-        layer->name = std::string(layer_name);
-//         fprintf(stderr, "new layer %d %s\n", layer_index, layer_name);
+        layers.resize(layer_count);
+        blobs.resize(blob_count);
 
         int layer_index = 0;
         int blob_index = 0;
@@ -256,18 +241,18 @@ namespace ncnn {
             int top_count;
             fread(&top_count, sizeof(int), 1, fp);
 
-        Layer* layer = create_layer(typeindex);
-        if (!layer)
-        {
-            int custom_index = typeindex & ~LayerType::CustomBit;
-            layer = create_custom_layer(custom_index);
-        }
-        if (!layer)
-        {
-            fprintf(stderr, "layer %d not exists or registered\n", typeindex);
-            clear();
-            return -1;
-        }
+            Layer* layer = create_layer(typeindex);
+            if (!layer)
+            {
+                int custom_index = typeindex & ~LayerType::CustomBit;
+                layer = create_custom_layer(custom_index);
+            }
+            if (!layer)
+            {
+                fprintf(stderr, "layer %d not exists or registered\n", typeindex);
+                clear();
+                return -1;
+            }
 
 //         layer->type = std::string(layer_type);
 //         layer->name = std::string(layer_name);
@@ -391,15 +376,27 @@ namespace ncnn {
 
         for (int i=0; i<layer_count; i++)
         {
-            int custom_index = typeindex & ~LayerType::CustomBit;
-            layer = create_custom_layer(custom_index);
-        }
-        if (!layer)
-        {
-            fprintf(stderr, "layer %d not exists or registered\n", typeindex);
-            clear();
-            return 0;
-        }
+            int typeindex = *(int*)mem;
+            mem += 4;
+
+            int bottom_count = *(int*)mem;
+            mem += 4;
+
+            int top_count = *(int*)mem;
+            mem += 4;
+
+            Layer* layer = create_layer(typeindex);
+            if (!layer)
+            {
+                int custom_index = typeindex & ~LayerType::CustomBit;
+                layer = create_custom_layer(custom_index);
+            }
+            if (!layer)
+            {
+                fprintf(stderr, "layer %d not exists or registered\n", typeindex);
+                clear();
+                return 0;
+            }
 
 //         layer->type = std::string(layer_type);
 //         layer->name = std::string(layer_name);
@@ -521,26 +518,26 @@ namespace ncnn {
 
     int Net::custom_layer_to_index(const char* type)
     {
-        if (strcmp(type, custom_layer_registry[i].name) == 0)
-            return i;
-    }
+        const int custom_layer_registry_entry_count = custom_layer_registry.size();
+        for (int i=0; i<custom_layer_registry_entry_count; i++)
+        {
+            if (strcmp(type, custom_layer_registry[i].name) == 0)
+                return i;
+        }
 
-    return -1;
-}
+        return -1;
+    }
 #endif // NCNN_STRING
 
-Layer* Net::create_custom_layer(int index)
-{
-    const int custom_layer_registry_entry_count = custom_layer_registry.size();
-    if (index < 0 || index >= custom_layer_registry_entry_count)
-        return 0;
+    Layer* Net::create_custom_layer(int index)
+    {
+        const int custom_layer_registry_entry_count = custom_layer_registry.size();
+        if (index < 0 || index >= custom_layer_registry_entry_count)
+            return 0;
 
-    layer_creator_func layer_creator = custom_layer_registry[index].creator;
-    if (!layer_creator)
-        return 0;
-
-    return layer_creator();
-}
+        layer_creator_func layer_creator = custom_layer_registry[index].creator;
+        if (!layer_creator)
+            return 0;
 
         return layer_creator();
     }
