@@ -20,7 +20,7 @@ cmake_minimum_required(VERSION 2.8.10)
 # set(CMAKE_BUILD_TYPE relwithdebinfo)
 set(CMAKE_BUILD_TYPE release)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -std=c++1z")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 option(NCNN_OPENMP "openmp support" ON)
 option(NCNN_STDIO "load model from external file" ON)
 option(NCNN_STRING "plain and verbose string" ON)
@@ -59,8 +59,8 @@ endif()
 
 ##############################################
 
-add_subdirectory(examples)
 add_subdirectory(src)
+add_subdirectory(examples)
 if(NOT ANDROID AND NOT IOS)
 add_subdirectory(tools)
 endif()

@@ -1,9 +1,3 @@
-
-find_package(OpenCV REQUIRED core highgui imgproc)
-
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../src)
-include_directories(${CMAKE_CURRENT_BINARY_DIR}/../src)
-
-add_executable(squeezenet squeezenet.cpp style_transfer.cpp.bk)
-
-target_link_libraries(squeezenet ncnn ${OpenCV_LIBS})
+add_subdirectory(classification)
+add_subdirectory(style_transfer)
+add_subdirectory(ssd)

@@ -13,93 +13,13 @@
 // specific language governing permissions and limitations under the License.
 
 #include "proposal.h"
+#include "bbox_util.h"
 #include <math.h>
-#include <algorithm>
-#include <vector>
 
 namespace ncnn {
 
 DEFINE_LAYER_CREATOR(Proposal)
 
-class Rect
-{
-public:
-    float x, y, width, height;
-
-    Rect() : x(0.f), y(0.f), width(0.f), height(0.f) {}
-    Rect(float _x, float _y, float _width, float _height) :x(_x), y(_y), width(_width), height(_height) {}
-    float area() const { return width * height; }
-    float inter_area(const Rect& rhs) const
-    {
-        float x2 = x + width;
-        float y2 = y + height;
-        float rhs_x2 = rhs.x + rhs.width;
-        float rhs_y2 = rhs.y + rhs.height;
-
-        float xL = std::max(x, rhs.x);
-        float xR = std::min(x2, rhs_x2);
-        if (xR <= xL)
-            return 0.f;
-
-        float yT = std::max(y, rhs.y);
-        float yB = std::min(y2, rhs_y2);
-        if (yB <= yT)
-            return 0.f;
-
-        return (xR - xL) * (yB - yT);
-    }
-};
-
-class ProposalBox
-{
-public:
-    Rect box;
-    float score;
-    float area() const { return box.area(); }
-    float inter_area(const ProposalBox& rhs) const { return box.inter_area(rhs.box); }
-    bool operator<(const ProposalBox& rhs) const { return score > rhs.score; }
-};
-
-static std::vector<int> nms(const std::vector<ProposalBox>& boxes, float nms_thresh)
-{
-    // NOTE boxes is already sorted
-    int size = boxes.size();
-
-    std::vector<float> areas;
-    areas.resize(size);
-    for (int i=0; i<size; i++)
-    {
-        areas[i] = boxes[i].area();
-    }
-
-    std::vector<int> suppressed;
-    suppressed.resize(size, 0);
-
-    std::vector<int> picked;
-
-    for (int i=0; i<size; i++)
-    {
-        if (suppressed[i] == 1)
-            continue;
-
-        picked.push_back(i);
-
-        for (int j=i+1; j<size; j++)
-        {
-            if (suppressed[j] == 1)
-                continue;
-
-            float intersize = boxes[i].inter_area(boxes[j]);
-            float ov = intersize / (areas[i] + areas[j] - intersize);
-            if (ov > nms_thresh)
-            {
-                suppressed[j] = 1;
-            }
-        }
-    }
-
-    return picked;
-}
 
 Proposal::Proposal()
 {

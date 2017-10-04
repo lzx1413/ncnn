@@ -26,7 +26,16 @@ message BlobProto {
 message BlobProtoVector {
   repeated BlobProto blobs = 1;
 }
-
+message NormalizedBBox {
+  optional float xmin = 1;
+  optional float ymin = 2;
+  optional float xmax = 3;
+  optional float ymax = 4;
+  optional int32 label = 5;
+  optional bool difficult = 6;
+  optional float score = 7;
+  optional float size = 8;
+}
 message Datum {
   optional int32 channels = 1;
   optional int32 height = 2;
@@ -403,7 +412,7 @@ message LayerParameter {
   optional ThresholdParameter threshold_param = 128;
   optional TileParameter tile_param = 138;
   optional WindowDataParameter window_data_param = 129;
-   optional InterpParameter interp_param = 14333;
+  optional InterpParameter interp_param = 14333;
 }
 
 // Message that stores parameters used to apply transformation

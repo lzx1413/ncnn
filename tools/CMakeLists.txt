@@ -15,6 +15,6 @@ target_link_libraries(caffe2ncnn ${PROTOBUF_LIBRARIES})
 
 include_directories(${CMAKE_SOURCE_DIR}/src)
 
-add_executable(ncnn2mem ncnn2mem.cpp)
+add_executable(ncnn2mem ncnn2mem.cpp ${CAFFE_PROTO_SRCS} ${CAFFE_PROTO_HDRS})
 
-target_link_libraries(ncnn2mem ncnn)
+target_link_libraries(ncnn2mem ncnn ${PROTOBUF_LIBRARIES})

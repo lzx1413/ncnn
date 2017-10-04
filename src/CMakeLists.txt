@@ -3,9 +3,12 @@
 
 configure_file(platform.h.in ${CMAKE_CURRENT_BINARY_DIR}/platform.h)
 
+find_package(Protobuf REQUIRED)
+include_directories(${PROTOBUF_INCLUDE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/layer)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/utils)
 
 set(ncnn_SRCS
     blob.cpp
@@ -14,8 +17,7 @@ set(ncnn_SRCS
     mat.cpp
     mat_pixel.cpp
     net.cpp
-    opencv.cpp
-        layer/priorbox.cpp layer/priorbox.h layer/detectionoutput.cpp layer/detectionoutput.h permute.cpp permute.h)
+    opencv.cpp utils/bbox_util.cpp utils/bbox_util.h )
 
 macro(ncnn_add_layer class)
     string(TOLOWER ${class} name)
@@ -112,9 +114,8 @@ ncnn_add_layer(PReLU)
 ncnn_add_layer(Proposal)
 ncnn_add_layer(Reduction OFF)
 ncnn_add_layer(ReLU)
-ncnn_add_layer(Reshape)
+ncnn_add_layer(Reshape ON)
 ncnn_add_layer(ROIPooling OFF)
-ncnn_add_layer(Reshape)
 ncnn_add_layer(Scale)
 ncnn_add_layer(Sigmoid)
 ncnn_add_layer(Slice)
@@ -129,6 +130,9 @@ ncnn_add_layer(LSTM OFF)
 ncnn_add_layer(BinaryOp)
 ncnn_add_layer(UnaryOp)
 ncnn_add_layer(Interp)
+ncnn_add_layer(PriorBox)
+ncnn_add_layer(Permute)
+ncnn_add_layer(DetectionOutput)
 ncnn_add_layer(ConvolutionDepthWise)
 ncnn_add_layer(Padding)
 

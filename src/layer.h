@@ -22,6 +22,7 @@
 #include "platform.h"
 
 namespace ncnn {
+#define MobileNetSSD
 
 class Layer
 {

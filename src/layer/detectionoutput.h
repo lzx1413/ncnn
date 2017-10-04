@@ -16,6 +16,7 @@
 #define LAYER_DETECTIONOUTPUT_H
 
 #include "layer.h"
+#include "caffe.pb.h"
 
 namespace ncnn {
 
@@ -36,7 +37,11 @@ namespace ncnn {
 
     public:
         // param
-        int feat_stride;
+        int num_classes;
+        float nms_threshold;
+        int nms_top_k;
+        int keep_top_k;
+        float confidence_threshold;
     };
 
 } // namespace ncnn

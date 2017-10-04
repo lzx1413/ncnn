@@ -28,45 +28,45 @@ namespace ncnn {
     }
 
 #if NCNN_STDIO
-    #if NCNN_STRING
-int PriorBox::load_param(FILE* paramfp)
-{
-    int nscan = fscanf(paramfp, "%d %d %d %d %d %d %f %f %f %f %f  %d %d",
-                       &image_width, &image_height, &min_size, &max_size, &ar[0], &ar[1], &var[0], &var[1], &var[2], &var[3], &offset, &flip, &clip);
-    if (nscan != 13)
+#if NCNN_STRING
+    int PriorBox::load_param(FILE* paramfp)
     {
-        printf("%d %d %d %d %d %d %f %f %f %f %f  %d %d\n",
-                       &image_width, &image_height, &min_size, &max_size, &ar[0], &ar[1], &var[0], &var[1], &var[2], &var[3], &offset, &flip, &clip);
-        fprintf(stderr, "PriorBox load_param failed %d\n", nscan);
-        return -1;
+        int nscan = fscanf(paramfp, "%d %d %d %d %d %d %f %f %f %f %f  %d %d",
+                           &image_width, &image_height, &min_size, &max_size, &ar[0], &ar[1], &var[0], &var[1], &var[2], &var[3], &offset, &flip, &clip);
+        if (nscan != 13)
+        {
+            printf("%d %d %d %d %d %d %f %f %f %f %f  %d %d\n",
+                   &image_width, &image_height, &min_size, &max_size, &ar[0], &ar[1], &var[0], &var[1], &var[2], &var[3], &offset, &flip, &clip);
+            fprintf(stderr, "PriorBox load_param failed %d\n", nscan);
+            return -1;
+        }
+
+        return 0;
     }
-
-    return 0;
-}
 #endif // NCNN_STRING
-int PriorBox::load_param_bin(FILE* paramfp)
-{
-    fread(&image_width, sizeof(int), 1, paramfp);
-    fread(&image_height, sizeof(int), 1, paramfp);
+    int PriorBox::load_param_bin(FILE* paramfp)
+    {
+        fread(&image_width, sizeof(int), 1, paramfp);
+        fread(&image_height, sizeof(int), 1, paramfp);
 
-    fread(&min_size, sizeof(int), 1, paramfp);
-    fread(&max_size, sizeof(int), 1, paramfp);
+        fread(&min_size, sizeof(int), 1, paramfp);
+        fread(&max_size, sizeof(int), 1, paramfp);
 
-    fread(&ar[0], sizeof(int), 1, paramfp);
-    fread(&ar[1], sizeof(int), 1, paramfp);
+        fread(&ar[0], sizeof(int), 1, paramfp);
+        fread(&ar[1], sizeof(int), 1, paramfp);
 
-    fread(&var[0], sizeof(float), 1, paramfp);
-    fread(&var[1], sizeof(float), 1, paramfp);
-    fread(&var[2], sizeof(float), 1, paramfp);
-    fread(&var[3], sizeof(float), 1, paramfp);
+        fread(&var[0], sizeof(float), 1, paramfp);
+        fread(&var[1], sizeof(float), 1, paramfp);
+        fread(&var[2], sizeof(float), 1, paramfp);
+        fread(&var[3], sizeof(float), 1, paramfp);
 
-    fread(&offset, sizeof(float), 1, paramfp);
+        fread(&offset, sizeof(float), 1, paramfp);
 
-    fread(&flip, sizeof(int), 1, paramfp);
-    fread(&clip, sizeof(int), 1, paramfp);
+        fread(&flip, sizeof(int), 1, paramfp);
+        fread(&clip, sizeof(int), 1, paramfp);
 
-    return 0;
-}
+        return 0;
+    }
 #endif // NCNN_STDIO
 
     int PriorBox::load_param(const unsigned char*& mem)
@@ -123,10 +123,12 @@ int PriorBox::load_param_bin(FILE* paramfp)
 
         int num_priors = 6;
         if(ar[1]==-233)
-            num_priors = 4;
+            num_priors = 3;
         int dim = layer_height * layer_width * num_priors * 4;
+        //printf("priorbox num: %d, w: %d, h: %d\n", dim, layer_width, layer_height);
 
-        top_blobs.create(dim*2);
+        //top_blobs.create(1, 2, dim);
+        top_blobs.create(dim,2);
         float* top_data = top_blobs;
 
         int idx = 0;
