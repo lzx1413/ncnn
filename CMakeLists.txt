@@ -60,7 +60,7 @@ endif()
 ##############################################
 
 add_subdirectory(src)
-add_subdirectory(examples)
 if(NOT ANDROID AND NOT IOS)
-add_subdirectory(tools)
+    add_subdirectory(tools)
+    add_subdirectory(examples)
 endif()
