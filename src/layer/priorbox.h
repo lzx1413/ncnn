@@ -26,7 +26,7 @@ public:
 
     virtual int load_param(const ParamDict& pd);
 
-    virtual int forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_blobs) const;
+    virtual int forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_blobs)const;
 
 public:
     Mat min_sizes;
@@ -40,6 +40,9 @@ public:
     float step_width;
     float step_height;
     float offset;
+    bool resuse_prior;
+    mutable bool first_process;
+    mutable Mat prior_box;
 };
 
 } // namespace ncnn
